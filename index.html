@@ -61,7 +61,7 @@
 						const buffer = await file.arrayBuffer();
 						const view = new Uint8Array(buffer);
 						const imageBlob = structuredClone(view);
-						const metaData = await Metadata.get_metadata(imageBlob);
+						const metaData = await Metadata.get_metadata(imageBlob, file.type);
 						const sanitized_gps = metaData.gps.split("[").join("").split("]").join("");
 
 						if (sanitized_gps.length) {
@@ -99,6 +99,7 @@
 						}
 
 						document.getElementById("title").append(metaData.title);
+						document.getElementById("author").append(metaData.author);
 						document.getElementById("copyright").append(metaData.copyright);
 						document.getElementById("description").append(metaData.description);
 						document.getElementById("width").append(metaData.width);
@@ -107,6 +108,9 @@
 						document.getElementById("make").append(metaData.make);
 						document.getElementById("model").append(metaData.model);
 						document.getElementById("flash_found").append(metaData.flash_found);
+						document.getElementById("subject_area").append(metaData.subject_area);
+						document.getElementById("thumbnails").append(metaData.thumbnails);
+						document.getElementById("original_document_id").append(metaData.original_document_id);
 
 						document.getElementById("iptc").append(metaData.iptc);
 						document.getElementById("xmp").append(metaData.xmp);
@@ -130,6 +134,9 @@
 		<div id="container">
 			<div id="title">
 				<strong> Title: </strong>
+			</div>
+			<div id="author">
+				<strong> Author: </strong>
 			</div>
 			<div id="description">
 				<strong> Description: </strong>
@@ -157,6 +164,15 @@
 			</div>
 			<div id="gps">
 				<strong> GPS: </strong>
+			</div>
+			<div id="subject_area">
+				<strong> SubjectArea: </strong>
+			</div>
+			<div id="thumbnails">
+				<strong> Thumbnails: </strong>
+			</div>
+			<div id="original_document_id">
+				<strong> Original Document ID: </strong>
 			</div>
 			<hr />
 			<div id="iptc">
