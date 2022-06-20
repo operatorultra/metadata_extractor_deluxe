@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Metadata</title>
+	</head>
+	<style>
+		* {
+			letter-spacing: 1.5px;
+		}
+		body {
+			background-color: hsl(222, 21%, 38%);
+			display: flex;
+			flex-flow: row;
+			align-items: center;
+		}
+		strong {
+			background-color: hsl(38, 79%, 66%);
+			color: black;
+		}
+		#load_metadata {
+			width: 510px;
+			padding: 25px;
+			cursor: pointer;
+			font-size: 21pt;
+			background-color: black;
+			color: white;
+			border: 5px solid black;
+		}
+
+		#map-container {
+			border: 5px solid black;
+			width: 500px;
+			height: 400px;
+			padding: 5px;
+		}
+		#container {
+			width: 500px;
+			height: 400px;
+			border: 5px solid black;
+			padding: 5px;
+			color: white;
+			overflow: auto;
+		}
+	</style>
+	<body>
+		<script type="module">
+			import init, { Metadata } from "./pkg/metadata.js";
+
+			// UI COMPONENTS
+			const input = document.getElementById("image-input");
+
+			// INITIALIZE WASM MODULE
+			async function run() {
+				await init();
+
+				input.addEventListener("change", (event) => {
+					Array.from(event.target.files).forEach(async (file) => {
+						const buffer = await file.arrayBuffer();
+						const view = new Uint8Array(buffer);
+						const imageBlob = structuredClone(view);
+						const metaData = await Metadata.get_metadata(imageBlob);
+						const sanitized_gps = metaData.gps.split("[").join("").split("]").join("");
+
+						if (sanitized_gps.length) {
+							const gps = JSON.parse(sanitized_gps.split(","));
+							let lat = [];
+							gps.latitude.split(" ").forEach((entry) => {
+								// degrees + (minutes/60) + (seconds/3600)
+								const parsedEntry = parseFloat(entry);
+								if (parsedEntry) {
+									lat.push(parsedEntry);
+								}
+							});
+							let lon = [];
+							gps.longitude.split(" ").forEach((entry) => {
+								// degrees + (minutes/60) + (seconds/3600)
+								const parsedEntry = parseFloat(entry);
+								if (parsedEntry) {
+									lon.push(parsedEntry);
+								}
+							});
+							const mapContainer = document.getElementById("map-container");
+							const map = document.createElement("iframe");
+							map.setAttribute("width", "500px");
+							map.setAttribute("height", "200px");
+							map.setAttribute(
+								"src",
+								`https://maps.google.com/maps?q=${lat.join(" ")}, ${lon.join(
+									" "
+								)}&t=&z=12&ie=UTF8&iwloc=&output=embed`
+							);
+							mapContainer.appendChild(map);
+							document
+								.getElementById("gps")
+								.append(gps.latitude + "," + gps.longitude);
+						}
+
+						document.getElementById("title").append(metaData.title);
+						document.getElementById("copyright").append(metaData.copyright);
+						document.getElementById("description").append(metaData.description);
+						document.getElementById("width").append(metaData.width);
+						document.getElementById("height").append(metaData.height);
+						document.getElementById("resolution").append(metaData.resolution);
+						document.getElementById("make").append(metaData.make);
+						document.getElementById("model").append(metaData.model);
+						document.getElementById("flash_found").append(metaData.flash_found);
+
+						document.getElementById("iptc").append(metaData.iptc);
+						document.getElementById("xmp").append(metaData.xmp);
+
+						// if (metaData.xmp) {
+						// 	// XMP DATA as xml
+						// 	const parser = new DOMParser();
+						// 	const xmlDoc = parser.parseFromString(metaData.xmp, "text/xml");
+
+						// 	Array(xmlDoc.documentElement.children[0].children[0].children).map(
+						// 		(child) => {
+						// 			// console.log(child);
+						// 		}
+						// 	);
+						// }
+					});
+				});
+			}
+			run();
+		</script>
+		<div id="container">
+			<div id="title">
+				<strong> Title: </strong>
+			</div>
+			<div id="description">
+				<strong> Description: </strong>
+			</div>
+			<div id="width">
+				<strong> Width: </strong>
+			</div>
+			<div id="height">
+				<strong> Height: </strong>
+			</div>
+			<div id="resolution">
+				<strong> Resolution: </strong>
+			</div>
+			<div id="copyright">
+				<strong> Copyright: </strong>
+			</div>
+			<div id="make">
+				<strong> The Make: </strong>
+			</div>
+			<div id="model">
+				<strong> Model: </strong>
+			</div>
+			<div id="flash_found">
+				<strong> Flash: </strong>
+			</div>
+			<div id="gps">
+				<strong> GPS: </strong>
+			</div>
+			<hr />
+			<div id="iptc">
+				<strong> IPTC: </strong>
+			</div>
+			<hr />
+			<div id="xmp"><strong> XMP: </strong></div>
+		</div>
+		<input
+			type="button"
+			id="load_metadata"
+			value="Get some sweet metadata"
+			onclick="document.getElementById('image-input').click();"
+		/>
+		<input type="file" id="image-input" multiple style="display: none" />
+		<div id="map-container"></div>
+	</body>
+</html>

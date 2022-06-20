@@ -1,0 +1,23 @@
+[package]
+name = "metadata_extractor"
+version = "0.1.1"
+authors = ["Juno Burger"]
+description = "A simple metadata extractor for images"
+license = "MIT/Apache-2.0"
+repository = "https://github.com/Junoburger/metadata_extractor"
+edition = "2021"
+
+[dependencies]
+# rexiv2 = "0.9.1"
+kamadak-exif = "0.5.4"
+wasm-bindgen = "0.2.80"
+serde = {version = "1.0", features = ["derive"]}
+serde_json = "1.0"
+minidom = "0.14.0"
+
+
+
+[lib]
+name= "metadata"
+path = "src/lib.rs"
+crate-type = ["cdylib"]

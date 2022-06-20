@@ -1,0 +1,16 @@
+{
+	"name": "metadata",
+	"version": "1.0.0",
+	"description": "",
+	"main": "",
+	"scripts": {
+		"start": "bash init.sh",
+		"test": "python3 -m http.server",
+		"build_wasm": "wasm-pack build --target web"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {},
+	"proxy": "http://localhost:8080"
+}
