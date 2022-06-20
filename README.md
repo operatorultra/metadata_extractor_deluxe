@@ -2,4 +2,4 @@
 
 ### To start
 
-`npm run init`
+`npm start`
