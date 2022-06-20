@@ -5,8 +5,9 @@ use pdf::{file::File, object::Resolve};
 
 use wasm_bindgen::prelude::*;
 
-static xmp_tag: u16 = 700;
-static iptc_tag: u16 = 33723;
+static XMP_TAG: u16 = 700;
+
+static IPTC_TAG: u16 = 33723;
 
 #[wasm_bindgen]
 pub struct Metadata {
@@ -106,14 +107,14 @@ impl Metadata {
 
             for field in exif.fields() {
                 //
-                if field.tag.number() == xmp_tag {
+                if field.tag.number() == XMP_TAG {
                     if let Value::Byte(value) = &field.value {
                         let value = std::str::from_utf8(&value).unwrap();
                         xmp = value.to_string().to_string();
                     }
                 }
 
-                if field.tag.number() == iptc_tag {
+                if field.tag.number() == IPTC_TAG {
                     if let Value::Undefined(value, _) = &field.value {
                         let value = std::str::from_utf8(&value).unwrap();
                         iptc = value.to_string().to_string();
